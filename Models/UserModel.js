@@ -10,6 +10,11 @@ const userschema = new mongoose.Schema( {
     password:String,
     profilepic:String,
     about:String,
+    gender:String,
+    phone:String,
+    address:String,
+    city:String,
+    country:String,
     followers:[{type:mongoose.Schema.Types.ObjectId,ref :'User'}],
     following:[{type:mongoose.Schema.Types.ObjectId,ref :'User'}],
     posts:[{type:mongoose.Schema.Types.ObjectId,ref :'Post'}]

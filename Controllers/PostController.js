@@ -9,14 +9,14 @@ const CreatePost = async (req, res) => {
 
     try {
 
-        const { caption, token } = req.body;
-        const image = req.file.path;
+        const { caption, image, token } = req.body;
+        // const image = req.file.path;
 
         const decoded = await jwt.decode(token, secretkey)
 
         const userId = decoded.userId;
         const author = decoded.username;
-
+         console.log("token "+token)
         const upload = await cloudinary.uploader.upload(image, {
             folder: "TheView imageUploads"
         });
@@ -24,15 +24,17 @@ const CreatePost = async (req, res) => {
         if (upload) {
 
             const imageurl = upload.secure_url;
-            const newPost = new Post({ author, caption, imageurl })
+            const newPost = new Post({ author, caption, imageurl,user:userId })
             const post = await newPost.save();
             if (post) {
 
                 const postId = post._id;
-
+                // const zer = await User.findById(userId)
+               
                 const userposted = await User.findByIdAndUpdate(userId, { $push: { posts: postId } });
-
+                
                 if (userposted) {
+                   
                     const populated = await Post.findById(postId).populate('user').exec();
                     if (populated) {
                         res.json({ message: "Item Added", post });
@@ -174,8 +176,6 @@ const EditPost = async (req, res) => {
 
                     if (upload) {
                         const imageurl = upload.secure_url;
-                        //   const imageurl = upload.secure_url;
-
                         const updatedpost = await Post.findByIdAndUpdate(postId,
                             { caption, imageurl },
                             { new: true }
@@ -279,7 +279,6 @@ const AddLike = async (req, res) => {
 const Addcomment = async (req, res) => {
     try {
         const { token, postId, content } = req.body;
-     
         const post = await Post.findById(postId);
 
         if (post) {
@@ -324,6 +323,9 @@ const Addcomment = async (req, res) => {
         res.json({ message: "something went wrong" })
     }
 }
+
+
+
 
 
 
