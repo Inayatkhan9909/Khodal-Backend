@@ -4,11 +4,14 @@ const cors = require("cors");
 const bodyparser = require("body-parser");
 require('dotenv').config();
 const multerMid = require("./Middlewears/Multer")
-const { RegisterHangle, LoginHandler,GetProfile,
-    AddprofilePic,Addabout,CompleteProfile,EditProfile } = require("./Controllers/UserController");
+const multerReelMid = require("./Middlewears/ReelMulter")
+const { RegisterHangle, LoginHandler, GetProfile,
+    AddprofilePic, Addabout, CompleteProfile, EditProfile } = require("./Controllers/UserController");
 
 const { CreatePost, getPosts, DeltePost, GetPostbyId
     , EditPost, AddLike, Addcomment } = require("./Controllers/PostController");
+
+const { CreatereelController, getReels } = require("./Controllers/ReelsController");
 
 
 const app = express();
@@ -27,25 +30,29 @@ else {
 
 app.post("/user/register", RegisterHangle);
 app.post("/user/login", LoginHandler);
-app.post("/user/addprofilepic",multerMid, AddprofilePic);
-app.post("/user/addabout",Addabout);
-app.post("/user/completeprofile",CompleteProfile);
+app.post("/user/addprofilepic", multerMid, AddprofilePic);
+app.post("/user/addabout", Addabout);
+app.post("/user/completeprofile", CompleteProfile);
 
-app.put("/user/editprofile",EditProfile)
+app.put("/user/editprofile", EditProfile)
 
+// Post section
 app.post("/post/CreatePost", multerMid, CreatePost);
 app.post("/post/AddLike", AddLike);
 app.post("/post/addcomment", Addcomment);
-
 
 app.delete("/post/DeltePost", DeltePost);
 
 app.put("/post/EditPost", multerMid, EditPost);
 
-
 app.get("/post/getPosts", getPosts);
 app.get("/post/GetPostbyId", GetPostbyId);
 app.get("/user/GetProfile", GetProfile);
+
+
+// Reels section
+app.post("/reels/create", multerReelMid, CreatereelController)
+app.get("/reels/getreels", getReels)
 
 
 

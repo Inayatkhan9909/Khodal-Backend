@@ -297,7 +297,7 @@ const Addcomment = async (req, res) => {
                     post.comments.push(newcomment);
                     const com = await post.save();
                     if (com) {
-                        res.json({ message: "comment added" });
+                        res.json({ message: "comment added",newcomment });
                     }
                     else {
                         res.json({ message: "comment failed" });
