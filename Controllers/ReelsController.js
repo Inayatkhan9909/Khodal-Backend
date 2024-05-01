@@ -11,28 +11,21 @@ const CreatereelController = async (req, res) => {
     try {
 
         const { caption, token } = req.body;
-        const video = req.file.path;
+         const video = req.file.path;
         const decoded = await jwt.decode(token, secretkey);
         console.log('File path:', req.file.path);
 
         const userId = decoded.userId;
         const author = decoded.username;
-        console.log("token " + token)
-         console.log(video)
-        // const upload = await cloudinary.uploader.upload(video, {
-        //     folder: "TheView ReelUploads"
-        // },
-        // { resource_type: "video" });
+
         const upload = await cloudinary.uploader.upload(video, {
             folder: "TheView ReelUploads",
             resource_type: "video"
         });
         
-            console.log("upload landi");
         if (upload && upload.secure_url) {
 
             const videourl = upload.secure_url;
-            console.log(videourl)
             const newReel = new Reel({ author, caption, videourl, user: userId })
             const reeldone = await newReel.save();
 
