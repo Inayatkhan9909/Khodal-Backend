@@ -151,6 +151,31 @@ const GetProfile = async (req, res) => {
         res.json({ message: "something went wrong" });
     }
 }
+const GetProfilebyUsername = async (req, res) => {
+    try {
+        const username = req.query;
+        console.log(username);
+        if(username !="" && username != undefined)
+            {
+                const user = await User.findOne(username);
+
+                if (user) {
+                    res.json({ message: "user found", user })
+                }
+                else {
+                    res.json({ message: "User not found" });
+                }
+            }
+            else {
+                res.json({ message: "User error" });
+            }
+
+    }
+    catch (error) {
+        console.log(error);
+        res.json({ message: "something went wrong" });
+    }
+}
 
 const AddprofilePic = async (req, res) => {
     try {
@@ -333,7 +358,68 @@ const EditProfile = async (req, res) => {
     }
 }
 
-module.exports = { RegisterHangle, LoginHandler, GetProfile, AddprofilePic, Addabout, CompleteProfile, EditProfile };
+const FollowController = async (req, res) => {
+    try {
+
+        const { token, followed } = req.body;
+
+        if (token != "" && token != undefined) {
+            const decoded = await jwt.decode(token, secretkey)
+            const userId = decoded.userId;
+            const user = await User.findById(followed);
+            const follower = await User.findById(userId);
+            if (user && follower) {
+                const alreadyFollowed = await user.followers.includes(userId);
+                if (!alreadyFollowed) {
+                    await follower.following.push(followed);
+                    const done2 = await follower.save();
+                    await user.followers.push(userId);
+                    const done = await user.save();
+
+                    if (done && done2) {
+
+                        res.json({ message: "followed" })
+                    }
+                    else {
+                        res.json({ message: "follow failed" });
+                    }
+                }
+                else {
+
+                    const index = await user.followers.indexOf(userId);
+                    const followerIndex = await follower.following.indexOf(followed);
+
+                    if (index !== -1 && followerIndex !== -1) {
+                        await follower.following.splice(followerIndex, 1);
+                        await follower.save();
+                        await user.followers.splice(index, 1);
+                        await user.save();
+                        res.json({ message: "unfollowed" });
+                    }
+                    else {
+                        res.json({ message: "unfollow failed" });
+                    }
+
+                }
+            }
+            else {
+                res.json({ message: "invalid user" });
+            }
+        }
+        else {
+            res.json({ message: "login error" });
+        }
+
+    } catch (error) {
+        console.log(error);
+        res.json({ message: "Something went wrong" });
+    }
+}
+
+module.exports = {
+    RegisterHangle, LoginHandler, GetProfile, GetProfilebyUsername, AddprofilePic,
+    Addabout, CompleteProfile, EditProfile, FollowController
+};
 
 
 

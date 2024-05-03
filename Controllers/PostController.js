@@ -11,43 +11,45 @@ const CreatePost = async (req, res) => {
 
         const { caption, image, token } = req.body;
         // const image = req.file.path;
-
-        const decoded = await jwt.decode(token, secretkey)
-
+        const decoded = await jwt.decode(token, secretkey);
         const userId = decoded.userId;
         const author = decoded.username;
-         console.log("token "+token)
         const upload = await cloudinary.uploader.upload(image, {
             folder: "TheView imageUploads"
         });
 
         if (upload) {
+            const Currentuser = await User.findById(userId);
 
-            const imageurl = upload.secure_url;
-            const newPost = new Post({ author, caption, imageurl,user:userId })
-            const post = await newPost.save();
-            if (post) {
+            if (Currentuser) {
+                const imageurl = upload.secure_url;
+                const newPost = new Post({ author, userProfile: Currentuser.profilepic, caption, imageurl, user: userId })
+                const post = await newPost.save();
+                if (post) {
 
-                const postId = post._id;
-                // const zer = await User.findById(userId)
-               
-                const userposted = await User.findByIdAndUpdate(userId, { $push: { posts: postId } });
-                
-                if (userposted) {
-                   
-                    const populated = await Post.findById(postId).populate('user').exec();
-                    if (populated) {
-                        res.json({ message: "Item Added", post });
+                    const postId = post._id;
+                    const userposted = await User.findByIdAndUpdate(userId, { $push: { posts: postId } });
+
+                    if (userposted) {
+
+                        const populated = await Post.findById(postId).populate('user').exec();
+                        if (populated) {
+                            res.json({ message: "Item Added", post });
+                        }
+                        else {
+                            res.json({ message: "not populated", postId });
+                        }
                     }
-                    else {
-                        res.json({ message: "not populated", postId });
-                    }
+
                 }
-
+                else {
+                    res.json({ message: "item not save due to some error" });
+                }
             }
             else {
-                res.json({ message: "item not save due to some error" });
+                res.json({ message: "User error" });
             }
+
         }
         else {
             res.json({ message: "Cloudinary error" });
@@ -297,7 +299,7 @@ const Addcomment = async (req, res) => {
                     post.comments.push(newcomment);
                     const com = await post.save();
                     if (com) {
-                        res.json({ message: "comment added",newcomment });
+                        res.json({ message: "comment added", newcomment });
                     }
                     else {
                         res.json({ message: "comment failed" });

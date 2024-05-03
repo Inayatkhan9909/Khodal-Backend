@@ -8,6 +8,7 @@ const Postschema = new mongoose.Schema({
     caption: String,
     imageurl: String,
     videourl: String,
+    userProfile:String,
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     CreatedAt:{type:Date,default:Date.now},
     likedby: [{ type: mongoose.Schema.Types.ObjectId }, 'User'],

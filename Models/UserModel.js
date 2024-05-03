@@ -16,8 +16,8 @@ const userschema = new mongoose.Schema( {
     address:String,
     city:String,
     country:String,
-    followers:[{type:mongoose.Schema.Types.ObjectId,ref :'User'}],
-    following:[{type:mongoose.Schema.Types.ObjectId,ref :'User'}],
+    followers:[{type:mongoose.Schema.Types.ObjectId,ref :'User', unique:true}],
+    following:[{type:mongoose.Schema.Types.ObjectId,ref :'User', unique:true}],
     posts:[{type:mongoose.Schema.Types.ObjectId,ref :'Post'}],
     Reels:[{type:mongoose.Schema.Types.ObjectId,ref :'Reel'}]
 

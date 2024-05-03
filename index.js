@@ -5,8 +5,8 @@ const bodyparser = require("body-parser");
 require('dotenv').config();
 const multerMid = require("./Middlewears/Multer")
 const multerReelMid = require("./Middlewears/ReelMulter")
-const { RegisterHangle, LoginHandler, GetProfile,
-    AddprofilePic, Addabout, CompleteProfile, EditProfile } = require("./Controllers/UserController");
+const { RegisterHangle, LoginHandler, GetProfile,GetProfilebyUsername,
+    AddprofilePic, Addabout, CompleteProfile, EditProfile,FollowController } = require("./Controllers/UserController");
 
 const { CreatePost, getPosts, DeltePost, GetPostbyId
     , EditPost, AddLike, Addcomment } = require("./Controllers/PostController");
@@ -27,12 +27,17 @@ else {
     console.log("Db not connected")
 }
 
+//user section
+
+app.get("/user/GetProfile", GetProfile);
+app.get("/user/GetProfilebyusername", GetProfilebyUsername);
 
 app.post("/user/register", RegisterHangle);
 app.post("/user/login", LoginHandler);
 app.post("/user/addprofilepic", multerMid, AddprofilePic);
 app.post("/user/addabout", Addabout);
 app.post("/user/completeprofile", CompleteProfile);
+app.post("/user/follow", FollowController);
 
 app.put("/user/editprofile", EditProfile)
 
@@ -47,7 +52,7 @@ app.put("/post/EditPost", multerMid, EditPost);
 
 app.get("/post/getPosts", getPosts);
 app.get("/post/GetPostbyId", GetPostbyId);
-app.get("/user/GetProfile", GetProfile);
+
 
 
 // Reels section
