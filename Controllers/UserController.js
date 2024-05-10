@@ -154,21 +154,20 @@ const GetProfile = async (req, res) => {
 const GetProfilebyUsername = async (req, res) => {
     try {
         const username = req.query;
-        console.log(username);
-        if(username !="" && username != undefined)
-            {
-                const user = await User.findOne(username);
 
-                if (user) {
-                    res.json({ message: "user found", user })
-                }
-                else {
-                    res.json({ message: "User not found" });
-                }
+        if (username != "" && username != undefined) {
+            const user = await User.findOne(username);
+
+            if (user) {
+                res.json({ message: "user found", user })
             }
             else {
-                res.json({ message: "User error" });
+                res.json({ message: "User not found" });
             }
+        }
+        else {
+            res.json({ message: "User error" });
+        }
 
     }
     catch (error) {
@@ -361,17 +360,21 @@ const EditProfile = async (req, res) => {
 const FollowController = async (req, res) => {
     try {
 
-        const { token, followed } = req.body;
+        const { username, token } = req.body;
 
         if (token != "" && token != undefined) {
             const decoded = await jwt.decode(token, secretkey)
             const userId = decoded.userId;
-            const user = await User.findById(followed);
+            const user = await User.findOne({ username });
             const follower = await User.findById(userId);
+
+          
+
             if (user && follower) {
                 const alreadyFollowed = await user.followers.includes(userId);
+               
                 if (!alreadyFollowed) {
-                    await follower.following.push(followed);
+                    await follower.following.push(user._id);
                     const done2 = await follower.save();
                     await user.followers.push(userId);
                     const done = await user.save();
@@ -379,15 +382,17 @@ const FollowController = async (req, res) => {
                     if (done && done2) {
 
                         res.json({ message: "followed" })
+                      
                     }
                     else {
                         res.json({ message: "follow failed" });
+                      
                     }
                 }
                 else {
-
+                    
                     const index = await user.followers.indexOf(userId);
-                    const followerIndex = await follower.following.indexOf(followed);
+                    const followerIndex = await follower.following.indexOf(user._id);
 
                     if (index !== -1 && followerIndex !== -1) {
                         await follower.following.splice(followerIndex, 1);
@@ -396,7 +401,7 @@ const FollowController = async (req, res) => {
                         await user.save();
                         res.json({ message: "unfollowed" });
                     }
-                    else {
+                    else {s
                         res.json({ message: "unfollow failed" });
                     }
 
@@ -404,10 +409,12 @@ const FollowController = async (req, res) => {
             }
             else {
                 res.json({ message: "invalid user" });
+               
             }
         }
         else {
             res.json({ message: "login error" });
+            
         }
 
     } catch (error) {
